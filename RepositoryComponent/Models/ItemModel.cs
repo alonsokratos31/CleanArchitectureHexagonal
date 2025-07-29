@@ -16,5 +16,7 @@ namespace RepositoryComponent.Models
 
         public DateTime CreatedDate { get; set; }
 
+        public ICollection<NoteModel> Notes { get; set; }
+
     }
 }

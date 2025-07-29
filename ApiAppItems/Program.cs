@@ -1,4 +1,6 @@
 using ApplicationComponent;
+using ApplicationComponent.DTOs;
+using DomainComponent.Entities;
 using DomainComponent.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using RepositoryComponent;
@@ -23,7 +25,13 @@ builder.Services.AddDbContext<ItemsDbContext>(options =>
 });
 
 builder.Services.AddTransient<IRepository, ItemRepository>();
+builder.Services.AddTransient<ICommonRepository<Note>, NoteRepository>();
 builder.Services.AddTransient<IService, ItemService>();
+builder.Services.AddTransient<ICommonService<Note>, NoteService>();
+
+// DTO en aplicacion
+builder.Services.AddTransient<ICommonRepository<NoteDTO>, NoteDTORepository>();
+builder.Services.AddTransient<ICommonService<NoteDTO>, NoteDTOService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -50,6 +58,27 @@ app.MapPost("/items", async (string title, IService service) =>
 
 }).WithName("AddItems");
 
+app.MapGet("/notes", async (ICommonService<Note> service) =>
+{
+    return await service.GetAsync();
+}).WithName("GetNotes");
+
+app.MapPost("/notes", async (Note note, ICommonService<Note> service) =>
+{
+    await service.AddAsync(note);
+    return Results.Created();
+}).WithName("AddNotes");
+
+app.MapGet("/notesdto", async (ICommonService<NoteDTO> service) =>
+{
+    return await service.GetAsync();
+}).WithName("GetNotesDTO");
+
+app.MapPost("/notesdto", async (NoteDTO note, ICommonService<NoteDTO> service) =>
+{
+    await service.AddAsync(note);
+    return Results.Created();
+}).WithName("AddNotesDto");
 
 app.Run();
 
